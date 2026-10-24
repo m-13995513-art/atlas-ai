@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#ffffff">
+<meta name="description" content="Atlas AI — A smarter space to think, create and explore.">
+<title>Atlas AI</title>
+
+<style>
+:root {
+  --bg: #ffffff;
+  --sidebar: #f7f8fa;
+  --text: #202124;
+  --muted: #737780;
+  --border: #e6e8ec;
+  --accent: #3159a8;
+  --hover: #eceff4;
+  --bubble: #f2f4f7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Arial, sans-serif;
+}
+
+button, textarea, input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app {
+  display: flex;
+  width: 100%;
+  height: 100dvh;
+}
+
+.sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  background: var(--sidebar);
+  border-right: 1px solid var(--border);
+  padding: 18px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: transform .25s ease;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  font-size: 23px;
+  font-weight: 650;
+  letter-spacing: -1px;
+}
+
+.brand img {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+}
+
+.brand-mark {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+  font-size: 29px;
+  font-weight: 800;
+}
+
+.brand span {
+  color: var(--accent);
+}
+
+.new-chat {
+  width: 100%;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  padding: 12px;
+  border-radius: 12px;
+  text-align: left;
+  transition: background .15s;
+}
+
+.new-chat:hover,
+.side-button:hover,
+.history-item:hover {
+  background: var(--hover);
+}
+
+.search {
+  width: 100%;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  padding: 10px 12px;
+  border-radius: 10px;
+  outline: none;
+  color: var(--text);
+}
+
+.section-label {
+  color: var(--muted);
+  font-size: 12px;
+  padding: 0 9px;
+  margin-top: 4px;
+}
+
+.history {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.history-item {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  border-radius: 9px;
+  padding: 10px;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.history-item.active {
+  background: var(--hover);
+}
+
+.side-bottom {
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+
+.side-button {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  padding: 11px;
+  border-radius: 9px;
+  text-align: left;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.topbar {
+  height: 66px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 22px;
+}
+
+.menu-button {
+  display: none;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: 23px;
+}
+
+.top-title {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.top-label {
+  color: var(--muted);
+  font-size: 12px;
+  margin-left: 5px;
+}
+
+.top-spacer {
+  flex: 1;
+}
+
+.theme-button {
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--bg);
+  color: var(--text);
+  padding: 8px 11px;
+}
+
+.conversation {
+  flex: 1;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+.chat-inner {
+  width: min(100%, 820px);
+  margin: 0 auto;
+  padding: 32px 24px 24px;
+}
+
+.welcome {
+  min-height: 52vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 24px 0 36px;
+}
+
+.welcome-mark {
+  width: 60px;
+  height: 60px;
+  border: 1px solid var(--border);
+  border-radius: 19px;
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+  font-size: 40px;
+  font-weight: 800;
+  margin-bottom: 25px;
+}
+
+.welcome h1 {
+  margin: 0;
+  font-size: clamp(27px, 4vw, 36px);
+  letter-spacing: -1.4px;
+  font-weight: 650;
+}
+
+.welcome p {
+  color: var(--muted);
+  margin: 12px 0 28px;
+  font-size: 15px;
+}
+
+.suggestions {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  max-width: 540px;
+}
+
+.suggestion {
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  border-radius: 13px;
+  padding: 15px;
+  text-align: left;
+  transition: border-color .15s, transform .15s;
+}
+
+.suggestion:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.suggestion strong {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.suggestion small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.message {
+  margin: 22px 0;
+  animation: appear .2s ease;
+}
+
+.message.user {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.message.user .content {
+  background: var(--bubble);
+  padding: 12px 16px;
+  border-radius: 18px;
+  max-width: 85%;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.65;
+}
+
+.message.assistant .content {
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+
+.message-label {
+  color: var(--muted);
+  font-size: 12px;
+  margin-bottom: 7px;
+}
+
+.message.assistant .content pre {
+  white-space: pre-wrap;
+  overflow-x: auto;
+  background: var(--sidebar);
+  border: 1px solid var(--border);
+  padding: 14px;
+  border-radius: 10px;
+}
+
+.message-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 9px;
+}
+
+.message-actions button {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 5px 9px;
+  font-size: 12px;
+}
+
+.composer-area {
+  flex-shrink: 0;
+  padding: 12px 20px 18px;
+  background: var(--bg);
+}
+
+.composer-inner {
+  width: min(100%, 820px);
+  margin: 0 auto;
+}
+
+.composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  border: 1px solid #d8dce3;
+  border-radius: 18px;
+  padding: 11px 12px 11px 16px;
+  background: var(--bg);
+  box-shadow: 0 3px 16px rgba(0,0,0,.035);
+}
+
+.composer:focus-within {
+  border-color: var(--accent);
+}
+
+#prompt {
+  flex: 1;
+  min-width: 0;
+  resize: none;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  max-height: 180px;
+  min-height: 28px;
+  line-height: 1.6;
+}
+
+#prompt::placeholder {
+  color: #9297a1;
+}
+
+.send-button {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 12px;
+  background: var(--accent);
+  color: white;
+  font-size: 19px;
+}
+
+.send-button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.disclaimer {
+  text-align: center;
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 10px;
+}
+
+.overlay {
+  display: none;
+}
+
+@keyframes appear {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+body.dark {
+  --bg: #17191e;
+  --sidebar: #111318;
+  --text: #eceef3;
+  --muted: #a1a6b1;
+  --border: #30343d;
+  --accent: #7899e8;
+  --hover: #262a32;
+  --bubble: #292d36;
+}
+
+body.dark .composer {
+  border-color: var(--border);
+}
+
+@media (max-width: 650px) {
+  .sidebar {
+    position: fixed;
+    z-index: 20;
+    inset: 0 auto 0 0;
+    width: min(290px, 85vw);
+    transform: translateX(-105%);
+    box-shadow: none;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+    box-shadow: 10px 0 40px rgba(0,0,0,.12);
+  }
+
+  .overlay.open {
+    display: block;
+    position: fixed;
+    z-index: 19;
+    inset: 0;
+    background: rgba(0,0,0,.35);
+  }
+
+  .menu-button {
+    display: block;
+  }
+
+  .topbar {
+    height: 58px;
+    padding: 0 13px;
+  }
+
+  .chat-inner {
+    padding: 20px 17px;
+  }
+
+  .welcome {
+    min-height: 48vh;
+  }
+
+  .suggestions {
+    gap: 8px;
+  }
+
+  .suggestion {
+    padding: 12px;
+  }
+
+  .composer-area {
+    padding: 9px 12px calc(12px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width: 360px) {
+  .suggestions {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark">A</div>
+      <div>Atlas <span>AI</span></div>
+    </div>
+
+    <button class="new-chat" id="newChat">＋ New Chat</button>
+
+    <input
+      class="search"
+      id="search"
+      type="search"
+      placeholder="Search chats..."
+      aria-label="Search chats"
+    >
+
+    <div class="section-label">RECENT CHATS</div>
+    <div class="history" id="history"></div>
+
+    <div class="side-bottom">
+      <button class="side-button" id="themeToggle">☾ Appearance</button>
+      <button class="side-button" id="renameChat">✎ Rename chat</button>
+      <button class="side-button" id="deleteChat">⌫ Delete chat</button>
+    </div>
+  </aside>
+
+  <div class="overlay" id="overlay"></div>
+
+  <main class="main">
+    <header class="topbar">
+      <button class="menu-button" id="menuButton" aria-label="Open menu">☰</button>
+      <div class="top-title">Atlas AI</div>
+      <div class="top-label">Your AI assistant</div>
+      <div class="top-spacer"></div>
+      <button class="theme-button" id="topTheme" aria-label="Toggle theme">◐</button>
+    </header>
+
+    <section class="conversation" id="conversation">
+      <div class="chat-inner" id="chatInner"></div>
+    </section>
+
+    <footer class="composer-area">
+      <div class="composer-inner">
+        <form class="composer" id="chatForm">
+          <textarea
+            id="prompt"
+            rows="1"
+            placeholder="Message Atlas..."
+            aria-label="Message Atlas"
+          ></textarea>
+          <button class="send-button" id="sendButton" type="submit" disabled aria-label="Send message">↑</button>
+        </form>
+        <div class="disclaimer">
+          Atlas can make mistakes. Check important information.
+        </div>
+      </div>
+    </footer>
+  </main>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+const STORAGE_KEY = "atlas-ai-conversations-v1";
+
+let conversations = [];
+let activeId = null;
+let busy = false;
+
+function makeId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+
+function save() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations));
+  } catch (error) {
+    console.warn("Could not save conversations.", error);
+  }
+}
+
+function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
+
+function formatText(text) {
+  let safe = escapeHTML(text);
+
+  safe = safe.replace(/```([\s\S]*?)```/g, (_, code) =>
+    "<pre><code>" + code.trim() + "</code></pre>"
+  );
+
+  safe = safe.replace(/`([^`\n]+)`/g, "<code>$1</code>");
+  safe = safe.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  safe = safe.replace(/\*([^*\n]+)\*/g, "<em>$1</em>");
+  safe = safe.replace(/\n/g, "<br>");
+
+  return safe;
+}
+
+function currentChat() {
+  return conversations.find(chat => chat.id === activeId);
+}
+
+function createChat() {
+  const chat = {
+    id: makeId(),
+    title: "New Chat",
+    messages: [],
+    updatedAt: Date.now()
+  };
+
+  conversations.unshift(chat);
+  activeId = chat.id;
+
+  save();
+  renderHistory();
+  renderChat();
+  closeSidebar();
+  $("prompt").focus();
+}
+
+function renderHistory() {
+  const query = $("search").value.trim().toLowerCase();
+
+  $("history").innerHTML = "";
+
+  conversations
+    .filter(chat => chat.title.toLowerCase().includes(query))
+    .forEach(chat => {
+      const button = document.createElement("button");
+
+      button.className =
+        "history-item" + (chat.id === activeId ? " active" : "");
+
+      button.textContent = chat.title;
+      button.title = chat.title;
+
+      button.onclick = () => {
+        activeId = chat.id;
+        renderHistory();
+        renderChat();
+        closeSidebar();
+      };
+
+      $("history").appendChild(button);
+    });
+}
+
+function renderChat() {
+  const chat = currentChat();
+
+  if (!chat) {
+    $("chatInner").innerHTML = "";
+    return;
+  }
+
+  if (chat.messages.length === 0) {
+    $("chatInner").innerHTML = `
+      <div class="welcome">
+        <div class="welcome-mark">A</div>
+        <h1>What can I help you with?</h1>
+        <p>Ask anything. Atlas is here to help.</p>
+
+        <div class="suggestions">
+          <button class="suggestion" data-prompt="Explain a difficult topic in simple words.">
+            <strong>Explain something</strong>
+            <small>Make complex ideas easier to understand</small>
+          </button>
+
+          <button class="suggestion" data-prompt="Help me write something clearly and naturally.">
+            <strong>Help me write</strong>
+            <small>Ideas, messages and creative writing</small>
+          </button>
+
+          <button class="suggestion" data-prompt="Help me write and understand some code.">
+            <strong>Code something</strong>
+            <small>Build, debug and learn</small>
+          </button>
+
+          <button class="suggestion" data-prompt="Translate a text and explain its meaning.">
+            <strong>Translate something</strong>
+            <small>Understand different languages</small>
+          </button>
+        </div>
+      </div>
+    `;
+
+    document.querySelectorAll(".suggestion").forEach(button => {
+      button.onclick = () => {
+        $("prompt").value = button.dataset.prompt;
+        updateComposer();
+        $("prompt").focus();
+      };
+    });
+
+    return;
+  }
+
+  $("chatInner").innerHTML = chat.messages.map((message, index) => `
+    <article class="message ${message.role === "user" ? "user" : "assistant"}">
+      ${message.role === "assistant" ? '<div class="message-label">Atlas</div>' : ""}
+      <div class="content">${formatText(message.content)}</div>
+      ${message.role === "assistant" && !message.pending ? `
+        <div class="message-actions">
+          <button data-copy="${index}">Copy</button>
+          <button data-regenerate="${index}">Regenerate</button>
+        </div>
+      ` : ""}
+    </article>
+  `).join("");
+
+  document.querySelectorAll("[data-copy]").forEach(button => {
+    button.onclick = async () => {
+      const message = chat.messages[Number(button.dataset.copy)];
+
+      try {
+        await navigator.clipboard.writeText(message.content);
+        button.textContent = "Copied!";
+        setTimeout(() => button.textContent = "Copy", 1200);
+      } catch {
+        alert("Copy failed. Please select and copy the text manually.");
+      }
+    };
+  });
+
+  document.querySelectorAll("[data-regenerate]").forEach(button => {
+    button.onclick = () => regenerate(Number(button.dataset.regenerate));
+  });
+
+  $("conversation").scrollTop = $("conversation").scrollHeight;
+}
+
+function updateComposer() {
+  const input = $("prompt");
+
+  $("sendButton").disabled = busy || !input.value.trim();
+
+  input.style.height = "auto";
+  input.style.height = Math.min(input.scrollHeight, 180) + "px";
+}
+
+function closeSidebar() {
+  $("sidebar").classList.remove("open");
+  $("overlay").classList.remove("open");
+}
+
+function toggleSidebar() {
+  $("sidebar").classList.toggle("open");
+  $("overlay").classList.toggle("open");
+}
+
+async function requestAtlas(messages) {
+  const response = await fetch("/api/chat", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ messages })
+  });
+
+  let data;
+
+  try {
+    data = await response.json();
+  } catch {
+    throw new Error("The AI server returned an invalid response.");
+  }
+
+  if (!response.ok) {
+    throw new Error(data.error || "The AI request failed.");
+  }
+
+  if (!data.reply) {
+    throw new Error("The AI server did not return a reply.");
+  }
+
+  return data.reply;
+}
+
+async function sendMessage(text) {
+  if (busy || !text.trim()) return;
+
+  if (!activeId) createChat();
+
+  const chat = currentChat();
+
+  chat.messages.push({
+    role: "user",
+    content: text.trim()
+  });
+
+  if (chat.title === "New Chat") {
+    chat.title = text.trim().slice(0, 36);
+  }
+
+  chat.updatedAt = Date.now();
+
+  busy = true;
+  $("prompt").value = "";
+  updateComposer();
+  save();
+  renderHistory();
+  renderChat();
+
+  const pending = {
+    role: "assistant",
+    content: "Thinking...",
+    pending: true
+  };
+
+  chat.messages.push(pending);
+  renderChat();
+
+  try {
+    const messages = chat.messages
+      .filter(message => !message.pending)
+      .map(message => ({
+        role: message.role,
+        content: message.content
+      }));
+
+    const reply = await requestAtlas(messages);
+
+    pending.content = reply;
+    delete pending.pending;
+  } catch (error) {
+    pending.content =
+      "I couldn't connect to the AI server.\n\n" +
+      error.message +
+      "\n\nThe chat interface is working, but the backend may not be deployed yet.";
+    delete pending.pending;
+  } finally {
+    busy = false;
+    chat.updatedAt = Date.now();
+    save();
+    renderHistory();
+    renderChat();
+    updateComposer();
+    $("prompt").focus();
+  }
+}
+
+async function regenerate(index) {
+  if (busy) return;
+
+  const chat = currentChat();
+  if (!chat || chat.messages[index]?.role !== "assistant") return;
+
+  chat.messages = chat.messages.slice(0, index);
+
+  const lastUser = [...chat.messages].reverse()
+    .find(message => message.role === "user");
+
+  save();
+  renderChat();
+
+  if (lastUser) {
+    const userText = lastUser.content;
+    chat.messages.pop();
+    await sendMessage(userText);
+  }
+}
+
+$("chatForm").addEventListener("submit", event => {
+  event.preventDefault();
+  const text = $("prompt").value;
+  if (text.trim()) sendMessage(text);
+});
+
+$("prompt").addEventListener("input", updateComposer);
+
+$("prompt").addEventListener("keydown", event => {
+  if (event.key === "Enter" && !event.shiftKey) {
+    event.preventDefault();
+    $("chatForm").requestSubmit();
+  }
+});
+
+$("newChat").onclick = createChat;
+$("search").addEventListener("input", renderHistory);
+$("menuButton").onclick = toggleSidebar;
+$("overlay").onclick = closeSidebar;
+
+$("renameChat").onclick = () => {
+  const chat = currentChat();
+  if (!chat) return;
+
+  const title = prompt("Enter a new conversation title:", chat.title);
+
+  if (title && title.trim()) {
+    chat.title = title.trim().slice(0, 80);
+    save();
+    renderHistory();
+  }
+};
+
+$("deleteChat").onclick = () => {
+  const chat = currentChat();
+  if (!chat) return;
+
+  if (!confirm("Delete this conversation?")) return;
+
+  conversations = conversations.filter(item => item.id !== activeId);
+  activeId = conversations[0]?.id || null;
+
+  save();
+
+  if (!activeId) createChat();
+  else {
+    renderHistory();
+    renderChat();
+  }
+};
+
+function toggleTheme() {
+  document.body.classList.toggle("dark");
+
+  localStorage.setItem(
+    "atlas-theme",
+    document.body.classList.contains("dark") ? "dark" : "light"
+  );
+}
+
+$("themeToggle").onclick = toggleTheme;
+$("topTheme").onclick = toggleTheme;
+
+if (localStorage.getItem("atlas-theme") === "dark") {
+  document.body.classList.add("dark");
+}
+
+try {
+  const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+
+  if (Array.isArray(stored)) {
+    conversations = stored.filter(chat =>
+      chat &&
+      typeof chat.id === "string" &&
+      Array.isArray(chat.messages)
+    );
+  }
+} catch {
+  conversations = [];
+}
+
+if (conversations.length) {
+  activeId = conversations[0].id;
+} else {
+  const chat = {
+    id: makeId(),
+    title: "New Chat",
+    messages: [],
+    updatedAt: Date.now()
+  };
+
+  conversations.push(chat);
+  activeId = chat.id;
+  save();
+}
+
+renderHistory();
+renderChat();
+updateComposer();
+</script>
+</body>
+</html>
